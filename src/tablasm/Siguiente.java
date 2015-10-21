@@ -9,22 +9,22 @@ import java.util.ArrayList;
 
 /**
  *
- * @author dell
+ * @author Andoresu
  */
-public class Primero {
+public class Siguiente {
     public String noTerminal;
-    public ArrayList<String> primeros = new ArrayList<>();
+    public ArrayList<String> siguientes = new ArrayList<>();
 
-    public Primero(String noTerminal) {
+    public Siguiente(String noTerminal) {
         this.noTerminal = noTerminal;
     }
     
     @Override
     public String toString(){
-        String s = "PRIMERO(" + this.noTerminal + ") = ";
-        for (String primero : this.primeros) {
-            s += primero + " ";
+        String s = "SIGUIENTE(" + this.noTerminal + ") = ";
+        for (String siguiente : this.siguientes) {
+            s += siguiente + " ";
         }        
         return s;        
-    }    
+    }  
 }

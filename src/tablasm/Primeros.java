@@ -37,18 +37,22 @@ public class Primeros {
                    if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
                        simbolo += "'";
                    }
-               }                
-               if(Gramatica.isNonTerminal(simbolo)){
-                   if(!primero.primeros.contains(simbolo)){
-                       //getPrimeroR(simbolo);
-                       primero.primeros.add(simbolo);
-                   }
-                   //getPrimeroR(simbolo);
-               }else{
-                   if(!primero.primeros.contains(simbolo)){
-                       primero.primeros.add(simbolo);
-                   }
-               }
+                }  
+                if(!primero.primeros.contains(simbolo)){              
+                    primero.primeros.add(simbolo);
+                }
+                String miProduccion = produccion.replaceAll("&", "");
+                if(miProduccion.split("->").length > 1){
+                    simbolo = miProduccion.split("->")[1].substring(0, 1);
+                    if(miProduccion.split("->")[1].length()>1){
+                        if(miProduccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                            simbolo += "'";
+                        }
+                    }
+                    if(!primero.primeros.contains(simbolo) && simbolo.length()>0){              
+                        primero.primeros.add(simbolo);
+                    }
+                }
             }
         }
         Collections.reverse(primeros);
