@@ -27,7 +27,7 @@ public class TablasM {
         File archivoGramatica = fc.getSelectedFile();
         if(archivoGramatica!=null){
             Gramatica miGramatica = new Gramatica(archivoGramatica);
-            System.out.println(miGramatica.expresiones.toString());
+            System.out.println(miGramatica.producciones.toString());
             System.out.println(miGramatica.noTerminales.toString());
             System.out.println(miGramatica.terminales.toString());
             Primeros primeros = new Primeros(miGramatica);

@@ -6,6 +6,8 @@
 package tablasm;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 
 /**
  *
@@ -28,50 +30,87 @@ public class Primeros {
     
     public void setPrimeros(){
         for (Primero primero : primeros) {
-            ArrayList<String> expresiones = getExpresiones(primero.noTerminal);
-            for (String expresion : expresiones) {
-               String letra = expresion.substring(3,4);
-               if(Gramatica.isNonTerminal(letra)){
-                   
-                   getPrimero(letra);
+            ArrayList<String> producciones = getProducciones(primero.noTerminal);
+            for (String produccion : producciones) {
+               String simbolo = produccion.split("->")[1].substring(0, 1);
+               if(produccion.split("->")[1].length()>1){
+                   if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                       simbolo += "'";
+                   }
+               }                
+               if(Gramatica.isNonTerminal(simbolo)){
+                   if(!primero.primeros.contains(simbolo)){
+                       //getPrimeroR(simbolo);
+                       primero.primeros.add(simbolo);
+                   }
+                   //getPrimeroR(simbolo);
                }else{
-                   if(!primero.primeros.contains(letra)){
-                       primero.primeros.add(letra);
+                   if(!primero.primeros.contains(simbolo)){
+                       primero.primeros.add(simbolo);
                    }
                }
             }
-        }        
+        }
+        Collections.reverse(primeros);
+        for (Primero primero : primeros) {
+            for (int i = 0 ; i < primero.primeros.size(); i++) {
+                String simbolo = primero.primeros.get(i);
+                if(Gramatica.isNonTerminal(simbolo)){
+                    primero.primeros.addAll(getPrimero(simbolo));
+                    primero.primeros.remove(simbolo);    
+                    i = -1;
+                }
+            }
+        }
+        Collections.reverse(primeros);
+        for (Primero primero : primeros) {
+            primero.primeros = new ArrayList<String>(new LinkedHashSet<String>(primero.primeros));
+        }
+        
+    }    
+    
+    public ArrayList<String> getPrimero(String noTerminal){        
+        for (Primero primero : this.primeros) {
+            if(primero.noTerminal.compareTo(noTerminal)==0){
+                return primero.primeros;
+            }
+        }
+        return  null;
     }
     
-    public void getPrimero(String noTerminal){
-        ArrayList<String> expresiones = getExpresiones(noTerminal);
+    public void getPrimeroR(String noTerminal){
+        ArrayList<String> producciones = getProducciones(noTerminal);
         int i = 0;
         for (Primero primero : this.primeros) {
             if(primero.noTerminal.compareTo(noTerminal)==0){
                 i = this.primeros.indexOf(primero);
             }
         }
-        for (String expresion : expresiones) {
-            String letra = expresion.substring(3, 4);
-            if(Gramatica.isNonTerminal(letra)){
-                getPrimero(letra);
+        for (String produccion : producciones) {
+            String simbolo = produccion.split("->")[1].substring(0, 1);
+            if(produccion.split("->")[1].length()>1){
+                if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                    simbolo += "'";
+                }
+            }   
+            if(Gramatica.isNonTerminal(simbolo)){
+                getPrimeroR(simbolo);
             }else{
-                if(!this.primeros.get(i).primeros.contains(letra)){
-                    this.primeros.get(i).primeros.add(letra);
+                if(!this.primeros.get(i).primeros.contains(simbolo)){
+                    this.primeros.get(i).primeros.add(simbolo);
                 }
             }
         }
     }
     
-    public ArrayList<String> getExpresiones(String noTerminal){
-        ArrayList<String> expresiones = new ArrayList<>();
-        String s;
-        for (String expresion : this.gramatica.expresiones) {
-            s = expresion.substring(0,1);
-            if(s.compareTo(noTerminal)==0){
-                expresiones.add(expresion);
+    public ArrayList<String> getProducciones(String noTerminal){
+        ArrayList<String> producciones = new ArrayList<>();        
+        for (String produccion : this.gramatica.producciones) {            
+            String simbolo = produccion.split("->")[0];            
+            if(simbolo.compareTo(noTerminal)==0){
+                producciones.add(produccion);
             }
         }
-        return expresiones;
+        return producciones;
     }
 }
