@@ -43,12 +43,12 @@ public class Gramatica {
                 this.noTerminales.add(noTerminal);
             }            
             for (int i = 0; i < miProduccion[1].length(); i++) {                
-                if(!isNonTerminal(miProduccion[1].substring(i,i+1)) && !this.terminales.contains(miProduccion[1].substring(i,i+1))){
+                if(!isNonTerminal(miProduccion[1].substring(i,i+1)) && !this.terminales.contains(miProduccion[1].substring(i,i+1)) && miProduccion[1].substring(i,i+1).compareTo("'")!=0){
                     this.terminales.add(miProduccion[1].substring(i,i+1));
                 }
             }
         }
-        
+        terminales.remove("&");
     }
     
 }
