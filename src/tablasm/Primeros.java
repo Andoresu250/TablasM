@@ -154,9 +154,6 @@ public class Primeros {
                 primero.primeros.remove("&");
             }
          }
-         for (Primero primero : primeros) {
-             System.out.println(primero.toString());
-        }
     }    
     
     public ArrayList<String> getPrimeros(String noTerminal){        
