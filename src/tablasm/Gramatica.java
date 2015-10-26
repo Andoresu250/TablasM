@@ -21,7 +21,55 @@ public class Gramatica {
    
     public static boolean isNonTerminal(String s){
         return Character.isUpperCase(s.charAt(0));        
-    }    
+    }   
+    public ArrayList<String> getProducciones(String noTerminal){
+        ArrayList<String> producciones = new ArrayList<>();        
+        for (String produccion : this.producciones) {            
+            String simbolo = produccion.split("->")[0];            
+            if(simbolo.compareTo(noTerminal)==0){
+                producciones.add(produccion);
+            }
+        }
+        return producciones;
+    }
+    
+    public boolean hasRecursivity(String produccion){
+        String noTerminal = produccion.split("->")[0];
+        String simbolo = produccion.split("->")[1].substring(0,1);
+        if(produccion.split("->")[1].length() > 1){
+            if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                simbolo += "'";
+            }
+        }
+        return noTerminal.compareTo(simbolo)==0;
+    }
+    
+    public void removeRecursivity(){
+        ArrayList<String> nuevaProduccion = new ArrayList<>();
+        for (int i = 0; i < producciones.size(); i++) {
+            String produccion = producciones.get(i);
+             if(hasRecursivity(produccion)){
+                String noTerminal = produccion.split("->")[0];
+                String noTerminalPrima = noTerminal + "'";
+                String miProduccion = noTerminalPrima + "->" + produccion.split("->")[1].substring(1, produccion.split("->")[1].length()) + noTerminalPrima;                
+                ArrayList<String> temp = getProducciones(produccion.split("->")[0]);
+                temp.remove(produccion);
+                producciones.removeAll(temp);
+                nuevaProduccion.removeAll(temp);
+                if(!temp.isEmpty()){
+                    for (int j = 0; j < temp.size(); j++) {
+                        temp.set(j, temp.get(j)+noTerminalPrima);
+                    }
+                }
+                nuevaProduccion.addAll(temp);
+                nuevaProduccion.add(miProduccion);
+                nuevaProduccion.add(noTerminalPrima + "->&");
+            }else{
+                nuevaProduccion.add(produccion);
+            }
+        }
+        this.producciones = nuevaProduccion;
+    }
 
     public Gramatica(File miGramatica) {
         BufferedReader br = null;
@@ -34,6 +82,7 @@ public class Gramatica {
         } catch (Exception e) {
             
         }
+        removeRecursivity();
         String noTerminal;        
         String miExpresion;
         for (String produccion : this.producciones) {
@@ -48,7 +97,7 @@ public class Gramatica {
                 }
             }
         }
-        terminales.remove("&");
+        terminales.remove("&");        
     }
     
 }
