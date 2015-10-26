@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 /**
  *
@@ -43,6 +44,75 @@ public class Gramatica {
         }
         return noTerminal.compareTo(simbolo)==0;
     }
+    public boolean hasFactorization(String produccion){
+        String noTerminal = produccion.split("->")[0];        
+        ArrayList<String> producciones = getProducciones(noTerminal);
+        if(producciones.size()==1){
+            return false;
+        }
+        String simbolo = producciones.get(0).split("->")[1].substring(0, 1);
+        if(produccion.split("->")[1].length() > 1){
+            if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                simbolo += "'";
+            }
+        }
+        for (int i = 1; i < producciones.size(); i++) {            
+            String s = producciones.get(i).split("->")[1].substring(0, 1);
+            if(produccion.split("->")[1].length() > 1){
+                if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                    s += "'";
+                }
+            }
+            if(s.compareTo(simbolo)!=0){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+     public void removeFactorization(){
+         ArrayList<String> nuevaProduccion = new ArrayList<>();
+         for (int i = 0; i < producciones.size(); i++) {
+             String produccion = producciones.get(i);             
+             if(hasFactorization(produccion)){
+                 String newNonTerminal = newNonTerminal();
+                 String noTerminal = produccion.split("->")[0];
+                 String simbolo = produccion.split("->")[1].substring(0, 1);
+                 if(produccion.split("->")[1].length() > 1){
+                    if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
+                        simbolo += "'";
+                    }
+                }
+                String miProduccion = noTerminal + "->" +  simbolo + newNonTerminal;
+                ArrayList<String> temp = getProducciones(produccion.split("->")[0]);                
+                producciones.removeAll(temp);    
+                nuevaProduccion.removeAll(temp);                
+                for (int j = 0; j < temp.size(); j++) {
+                    String s = temp.get(j).substring(noTerminal.length() + 2 + simbolo.length());
+                    if(s.length()==0){
+                        s = "&";
+                    }
+                    temp.set(j, newNonTerminal + "->" + s);
+                }
+                nuevaProduccion.add(miProduccion);
+                nuevaProduccion.addAll(temp);
+
+             }else{
+                 nuevaProduccion.add(produccion);
+             }
+         }
+         this.producciones = new ArrayList<String>(new LinkedHashSet<String>(nuevaProduccion)) ;
+    }
+     
+    public String newNonTerminal(){
+        char randomChar = (char)((int)'A'+Math.random()*((int)'Z'-(int)'A'+1));
+        while(this.noTerminales.contains(randomChar+"")){
+            randomChar = (char)((int)'A'+Math.random()*((int)'Z'-(int)'A'+1));
+        }
+        this.noTerminales.add(randomChar+"");
+        return randomChar+"";
+    } 
+    
     
     public void removeRecursivity(){
         ArrayList<String> nuevaProduccion = new ArrayList<>();
@@ -68,7 +138,7 @@ public class Gramatica {
                 nuevaProduccion.add(produccion);
             }
         }
-        this.producciones = nuevaProduccion;
+        this.producciones = new ArrayList<String>(new LinkedHashSet<String>(nuevaProduccion)) ;
     }
 
     public Gramatica(File miGramatica) {
@@ -82,7 +152,6 @@ public class Gramatica {
         } catch (Exception e) {
             
         }
-        removeRecursivity();
         String noTerminal;        
         String miExpresion;
         for (String produccion : this.producciones) {
@@ -96,6 +165,16 @@ public class Gramatica {
                     this.terminales.add(miProduccion[1].substring(i,i+1));
                 }
             }
+        }
+        removeRecursivity();
+        removeFactorization(); 
+        this.noTerminales.clear();
+        for (String produccion : this.producciones) {
+            String[] miProduccion = produccion.split("->");
+            noTerminal = miProduccion[0];
+            if(!this.noTerminales.contains(noTerminal)){
+                this.noTerminales.add(noTerminal);
+            }   
         }
         terminales.remove("&");        
     }

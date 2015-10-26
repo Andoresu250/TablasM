@@ -68,16 +68,7 @@ public class TablaM {
     
     public static void main(String[] args) {
         View vista = new View();
-        vista.show();        
-        /*JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
-        FileNameExtensionFilter filtro = new FileNameExtensionFilter("TXT File","txt");
-        fc.setFileFilter(filtro);
-        fc.showOpenDialog(fc);
-        File archivoGramatica = fc.getSelectedFile();
-        if(archivoGramatica!=null){
-            Gramatica g = new Gramatica(archivoGramatica);
-            System.out.println(g.producciones.toString());
-        }*/
+        vista.show();                      
     }
     
 }
