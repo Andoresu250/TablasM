@@ -55,13 +55,7 @@ public class Siguientes {
         for (String produccion : gramatica.producciones) {
             String miProduccion = produccion.split("->")[1];
             for (int i = 0; i < miProduccion.length(); i++) {
-                String simbolo = miProduccion.substring(i,i+1);
-                if(miProduccion.length()-1>i){
-                   if(miProduccion.substring(i+1,i+2).compareTo("'")==0){
-                       simbolo += "'";                       
-                       i++;
-                   }
-                }
+                String simbolo = miProduccion.substring(i,i+1);                
                 if(Gramatica.isNonTerminal(simbolo)){
                     ArrayList<String> miniPrimero = primeros.miniPrimeros(miProduccion.substring(i+1));
                     if(miniPrimero.size()>0){

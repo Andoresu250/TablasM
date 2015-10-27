@@ -21,20 +21,9 @@ public class TablaM {
     }
     
     public String invertirCadena(String produccion){
-        String s = "";
-        boolean sw = false;
+        String s = "";        
         for (int i = produccion.length(); i > 0; i--) {
-            String l = produccion.substring(i-1, i);
-            if(sw){
-                s += l + "'";
-                sw = false;
-            }else{
-                if(l.compareTo("'")==0){
-                    sw = true;                
-                }else{
-                    s += l;
-                }
-            }  
+            s += produccion.substring(i-1, i);
         }
         return s;
     }
@@ -53,10 +42,7 @@ public class TablaM {
                 sw = false;
                 break;
             }
-            String pila = m[i][0].substring(m[i][0].length()-1);
-            if(pila.compareTo("'")==0){
-                pila = m[i][0].substring(m[i][0].length()-2);
-            }
+            String pila = m[i][0].substring(m[i][0].length()-1);            
             String entrada = m[i][1].substring(0,1);
             if(Gramatica.isNonTerminal(pila)){
                 String produccion = getProduccion(pila, entrada);

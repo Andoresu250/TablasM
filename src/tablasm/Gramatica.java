@@ -36,12 +36,7 @@ public class Gramatica {
     
     public boolean hasRecursivity(String produccion){
         String noTerminal = produccion.split("->")[0];
-        String simbolo = produccion.split("->")[1].substring(0,1);
-        if(produccion.split("->")[1].length() > 1){
-            if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                simbolo += "'";
-            }
-        }
+        String simbolo = produccion.split("->")[1].substring(0,1);        
         return noTerminal.compareTo(simbolo)==0;
     }
     public boolean hasFactorization(String produccion){
@@ -50,19 +45,9 @@ public class Gramatica {
         if(producciones.size()==1){
             return false;
         }
-        String simbolo = producciones.get(0).split("->")[1].substring(0, 1);
-        if(produccion.split("->")[1].length() > 1){
-            if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                simbolo += "'";
-            }
-        }
+        String simbolo = producciones.get(0).split("->")[1].substring(0, 1);        
         for (int i = 1; i < producciones.size(); i++) {            
-            String s = producciones.get(i).split("->")[1].substring(0, 1);
-            if(produccion.split("->")[1].length() > 1){
-                if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                    s += "'";
-                }
-            }
+            String s = producciones.get(i).split("->")[1].substring(0, 1);            
             if(s.compareTo(simbolo)!=0){
                 return false;
             }
@@ -77,12 +62,7 @@ public class Gramatica {
              if(hasFactorization(produccion)){
                  String newNonTerminal = newNonTerminal();
                  String noTerminal = produccion.split("->")[0];
-                 String simbolo = produccion.split("->")[1].substring(0, 1);
-                 if(produccion.split("->")[1].length() > 1){
-                    if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                        simbolo += "'";
-                    }
-                }
+                 String simbolo = produccion.split("->")[1].substring(0, 1);                 
                 String miProduccion = noTerminal + "->" +  simbolo + newNonTerminal;
                 ArrayList<String> temp = getProducciones(produccion.split("->")[0]);                
                 producciones.removeAll(temp);    
@@ -120,7 +100,7 @@ public class Gramatica {
             String produccion = producciones.get(i);
              if(hasRecursivity(produccion)){
                 String noTerminal = produccion.split("->")[0];
-                String noTerminalPrima = noTerminal + "'";
+                String noTerminalPrima = newNonTerminal();
                 String miProduccion = noTerminalPrima + "->" + produccion.split("->")[1].substring(1, produccion.split("->")[1].length()) + noTerminalPrima;                
                 ArrayList<String> temp = getProducciones(produccion.split("->")[0]);
                 temp.remove(produccion);
