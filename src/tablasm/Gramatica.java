@@ -130,6 +130,8 @@ public class Gramatica {
                     for (int j = 0; j < temp.size(); j++) {
                         temp.set(j, temp.get(j)+noTerminalPrima);
                     }
+                }else{
+                    temp.add(noTerminal + "->" + noTerminalPrima);
                 }
                 nuevaProduccion.addAll(temp);
                 nuevaProduccion.add(miProduccion);
@@ -166,8 +168,8 @@ public class Gramatica {
                 }
             }
         }
-        removeRecursivity();
-        removeFactorization(); 
+        removeFactorization();
+        removeRecursivity();         
         this.noTerminales.clear();
         for (String produccion : this.producciones) {
             String[] miProduccion = produccion.split("->");
