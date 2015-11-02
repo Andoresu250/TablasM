@@ -21,9 +21,9 @@ public class TablaM {
     }
     
     public String invertirCadena(String produccion){
-        String s = "";        
+        String s = "";
         for (int i = produccion.length(); i > 0; i--) {
-            s += produccion.substring(i-1, i);
+            s += produccion.substring(i-1, i);              
         }
         return s;
     }
@@ -42,12 +42,11 @@ public class TablaM {
                 sw = false;
                 break;
             }
-            String pila = m[i][0].substring(m[i][0].length()-1);            
+            String pila = m[i][0].substring(m[i][0].length()-1);
             String entrada = m[i][1].substring(0,1);
             if(Gramatica.isNonTerminal(pila)){
                 String produccion = getProduccion(pila, entrada);
-                if(produccion.compareTo("")==0){
-                    JOptionPane.showMessageDialog(null, "La cadena " + cadena + " No es producida por la GIC");
+                if(produccion.compareTo("")==0){                    
                     String[][] analisis = new String[i+1][3];
                     for (int j = 0; j < analisis.length; j++) {
                         analisis[j][0] = m[j][0];
@@ -68,8 +67,7 @@ public class TablaM {
                     i++;
                     m[i][0] = m[i-1][0].substring(0,m[i-1][0].length()-1);
                     m[i][1] = m[i-1][1].substring(1);
-                }else{
-                    JOptionPane.showMessageDialog(null, "La cadena " + cadena + " No es producida por la GIC");
+                }else{                    
                     String[][] analisis = new String[i+1][3];
                     for (int j = 0; j < analisis.length; j++) {
                         analisis[j][0] = m[j][0];
@@ -146,7 +144,7 @@ public class TablaM {
     
     public static void main(String[] args) {
         View vista = new View();
-        vista.show();       
+        vista.show();   
     }
     
 }

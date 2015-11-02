@@ -49,7 +49,7 @@ public class Primeros {
         ArrayList<String> primeros = new ArrayList<>();
         boolean hasEpsilon = true;
         for (int i = 0; i < produccion.length(); i++) {
-            String simbolo = produccion.substring(i,i+1);            
+            String simbolo = produccion.substring(i,i+1);
             if(Gramatica.isNonTerminal(simbolo)){
                 primeros.addAll(getPrimeros(simbolo));
                 if(!hasEpsilon(simbolo)){
@@ -74,10 +74,11 @@ public class Primeros {
     
     public void setPrimeros(){
         //Inicializar primeros
+        String s = gramatica.producciones.toString();        
         for (Primero primero : primeros) {
             ArrayList<String> producciones = getProducciones(primero.noTerminal);
             for (String produccion : producciones) {
-               String simbolo = produccion.split("->")[1].substring(0, 1);               
+               String simbolo = produccion.split("->")[1].substring(0, 1);
                 if(!primero.primeros.contains(simbolo)){              
                     primero.primeros.add(simbolo);
                     if(Gramatica.isNonTerminal(simbolo)){
@@ -92,11 +93,11 @@ public class Primeros {
         for (Primero primero : primeros) {
             ArrayList<String> producciones = getProducciones(primero.noTerminal);
             for (String produccion : producciones) {
-               String simbolo = produccion.split("->")[1].substring(0, 1);                 
+               String simbolo = produccion.split("->")[1].substring(0, 1);
                 if(hasEpsilon(simbolo)){
                     for (int i = simbolo.length(); i < produccion.split("->")[1].length(); i++) {
                         simbolo = produccion.split("->")[1].substring(i,i+1);                        
-                        primero.primeros.add(simbolo);                        
+                        primero.primeros.add(simbolo);
                         if(hasEpsilon(simbolo)){
                              if(!primero.primeros.contains(simbolo)){              
                                 primero.primeros.add(simbolo);                                
@@ -113,7 +114,7 @@ public class Primeros {
             ArrayList<String> producciones = getProducciones(primero.noTerminal);
             boolean hasEpsilon = true;
             for (String produccion : producciones) {
-               String simbolo = produccion.split("->")[1].substring(0, 1);               
+               String simbolo = produccion.split("->")[1].substring(0, 1);
                if(producciones.toString().contains("->&")){                   
                    break;
                }else{
@@ -165,7 +166,7 @@ public class Primeros {
             }
         }
         for (String produccion : producciones) {
-            String simbolo = produccion.split("->")[1].substring(0, 1);              
+            String simbolo = produccion.split("->")[1].substring(0, 1);
             if(Gramatica.isNonTerminal(simbolo)){
                 if(!this.primeros.get(i).primeros.contains(simbolo)){
                     this.primeros.get(i).primeros.add(simbolo);
