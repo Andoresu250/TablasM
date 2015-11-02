@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
  * @author dell
  */
 public class Gramatica {
+    public ArrayList<String> original = new ArrayList<>();
     public ArrayList<String> producciones = new ArrayList<>();
     public ArrayList<String> terminales = new ArrayList<>();
     public ArrayList<String> noTerminales = new ArrayList<>();
@@ -154,7 +155,8 @@ public class Gramatica {
         try {
             String line;
             br = new BufferedReader(new FileReader(miGramatica));
-            while((line = br.readLine())!=null){                  
+            while((line = br.readLine())!=null){ 
+                this.original.add(line);
                 this.producciones.add(line);
             }
         } catch (Exception e) {
