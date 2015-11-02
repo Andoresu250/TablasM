@@ -44,64 +44,70 @@ public class Gramatica {
         }
         return noTerminal.compareTo(simbolo)==0;
     }
-    public boolean hasFactorization(String produccion){
-        String noTerminal = produccion.split("->")[0];        
+    
+    public boolean factorize(String noTerminal){        
         ArrayList<String> producciones = getProducciones(noTerminal);
+        ArrayList<String> temp = new ArrayList<>();
         if(producciones.size()==1){
-            return false;
+            return true; 
         }
-        String simbolo = producciones.get(0).split("->")[1].substring(0, 1);
-        if(produccion.split("->")[1].length() > 1){
-            if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                simbolo += "'";
-            }
-        }
-        for (int i = 1; i < producciones.size(); i++) {            
-            String s = producciones.get(i).split("->")[1].substring(0, 1);
+        //Collections.sort(producciones);        
+        for (String produccion : producciones) {            
+            ArrayList<String> factorizables = new ArrayList<>();
+            ArrayList<String> noFactorizables = new ArrayList<>();
+            factorizables.add(produccion);
+            temp.add(produccion);
+            String alfa1 = produccion.split("->")[1].substring(0,1);
             if(produccion.split("->")[1].length() > 1){
                 if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                    s += "'";
+                    alfa1 += "'";
                 }
             }
-            if(s.compareTo(simbolo)!=0){
-                return false;
-            }
-        }
-        return true;
-    }
-    
-     public void removeFactorization(){
-         ArrayList<String> nuevaProduccion = new ArrayList<>();
-         for (int i = 0; i < producciones.size(); i++) {
-             String produccion = producciones.get(i);             
-             if(hasFactorization(produccion)){
-                 String newNonTerminal = newNonTerminal();
-                 String noTerminal = produccion.split("->")[0];
-                 String simbolo = produccion.split("->")[1].substring(0, 1);
-                 if(produccion.split("->")[1].length() > 1){
-                    if(produccion.split("->")[1].substring(1,2).compareTo("'")==0){
-                        simbolo += "'";
+            for (String produccionFac : producciones) {
+                if(produccion.compareTo(produccionFac)!=0){
+                    String alfa2 = produccionFac.split("->")[1].substring(0,1);
+                    if(produccionFac.split("->")[1].length() > 1){
+                        if(produccionFac.split("->")[1].substring(1,2).compareTo("'")==0){
+                            alfa2 += "'";
+                        }
+                    }
+                    if(alfa1.compareTo(alfa2)==0){
+                        factorizables.add(produccionFac);
+                        temp.add(produccionFac);
+                    }else{
+                        noFactorizables.add(produccionFac);
+                        temp.add(produccionFac);
                     }
                 }
-                String miProduccion = noTerminal + "->" +  simbolo + newNonTerminal;
-                ArrayList<String> temp = getProducciones(produccion.split("->")[0]);                
-                producciones.removeAll(temp);    
-                nuevaProduccion.removeAll(temp);                
-                for (int j = 0; j < temp.size(); j++) {
-                    String s = temp.get(j).substring(noTerminal.length() + 2 + simbolo.length());
+            }
+            if(factorizables.size()==1){
+                factorizables.clear();
+                temp.clear();
+            }else{
+                //factorizar
+                String nuevoNoTerminal = newNonTerminal();
+                String nuevaProduccion = noTerminal + "->" + alfa1 + nuevoNoTerminal;
+                ArrayList<String> nuevasProducciones = new ArrayList<>();
+                nuevasProducciones.add(nuevaProduccion);
+                nuevasProducciones.addAll(noFactorizables);
+                for (String fac : factorizables) {
+                    String s = fac.substring(noTerminal.length() + 2 + alfa1.length());
                     if(s.length()==0){
                         s = "&";
                     }
-                    temp.set(j, newNonTerminal + "->" + s);
+                    nuevasProducciones.add(nuevoNoTerminal + "->" + s);
                 }
-                nuevaProduccion.add(miProduccion);
-                nuevaProduccion.addAll(temp);
-
-             }else{
-                 nuevaProduccion.add(produccion);
-             }
-         }
-         this.producciones = new ArrayList<String>(new LinkedHashSet<String>(nuevaProduccion)) ;
+                producciones.removeAll(temp);       
+                temp.removeAll(noFactorizables);
+                //Collections.sort(this.producciones);
+                this.producciones.addAll(this.producciones.indexOf(produccion), nuevasProducciones);
+                this.producciones.removeAll(temp);
+                this.producciones =  new ArrayList<String>(new LinkedHashSet<String>(this.producciones));
+                temp.clear(); 
+                return false;
+            }            
+        }        
+        return true;
     }
      
     public String newNonTerminal(){
@@ -168,7 +174,13 @@ public class Gramatica {
                 }
             }
         }
-        removeFactorization();
+        int i = 0;
+        while( i < this.noTerminales.size()){
+            while(!factorize(this.noTerminales.get(i))){  
+                i = 0;
+            }
+            i++;
+        }         
         removeRecursivity();         
         this.noTerminales.clear();
         for (String produccion : this.producciones) {

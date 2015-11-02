@@ -160,7 +160,7 @@ public class TablaM {
     
     public static void main(String[] args) {
         View vista = new View();
-        vista.show();       
+        vista.show();   
     }
     
 }
