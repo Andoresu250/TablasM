@@ -161,6 +161,7 @@ public class TablaM {
     public static void main(String[] args) {
         View vista = new View();
         vista.show();   
+        String s = "1";        
     }
     
 }

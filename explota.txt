@@ -1,3 +1,4 @@
+D->A
 A->AB
 A->ApC
 A->ApD
