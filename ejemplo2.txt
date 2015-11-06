@@ -1,4 +1,7 @@
-S->(L)
-S->a
-L->L,S
-L->S
+A->BCDf
+A->adfgdfg
+B->b
+B->&
+C->c
+C->&
+D->d

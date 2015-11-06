@@ -1,5 +1,6 @@
 package tablasm;
 
+import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
@@ -159,9 +160,23 @@ public class TablaM {
     }
     
     public static void main(String[] args) {
-        View vista = new View();
-        vista.show();   
-        String s = "1";        
+        //View vista = new View();
+        //vista.show();   
+        File gramatica = new File(System.getProperty("user.dir") + "//" + "ejemplo2.txt");
+        Gram g = new Gram(gramatica);
+        System.out.println("Producciones: ");
+        System.out.println(g.producciones.toString());
+        System.out.println("No terminales: ");
+        System.out.println(g.noTerminales.toString());
+        System.out.println("Terminales: ");
+        System.out.println(g.terminales.toString());
+        for(NoTerminal nt : g.noTerminales){
+            System.out.println(nt.produceEpsilon);
+        }
+        System.out.println("Primeros: ");        
+        for(Prim primero : g.primeros){
+            System.out.println(primero.toString());
+        }
     }
     
 }

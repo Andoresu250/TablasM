@@ -80,8 +80,6 @@ public class Primeros {
     
     public void setPrimeros(){
         //Inicializar primeros
-        String s = gramatica.producciones.toString();
-        System.out.println(s);
         for (Primero primero : primeros) {
             ArrayList<String> producciones = getProducciones(primero.noTerminal);
             for (String produccion : producciones) {
