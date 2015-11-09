@@ -1,182 +1,215 @@
 package tablasm;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import javax.swing.JOptionPane;
+
 
 
 public class TablaM {
     
-    Gramatica gramatica;
-    Primeros primeros;
-    Siguientes siguientes;
-    String[][] tablaM;
+    Gram gram;
+    Produccion[][] tM;
     
-    public String getProduccion(String noTerminal, String terminal){
-        int i = this.gramatica.noTerminales.indexOf(noTerminal);
-        int j = this.gramatica.terminales.indexOf(terminal);
-        if(j==-1){
-            return "";
+    public Produccion getProduccion(NoTerminal noTerminal, Terminal terminal){
+        int i = gram.noTerminales.indexOf(noTerminal);
+        int j = gram.terminales.indexOf(terminal) - 1;
+        if(i==-1 || j==-1){
+            return null;
         }
-        return this.tablaM[i][j];
+        return tM[i][j];
+    }    
+    
+    public ArrayList<Simbolo> invertir(ArrayList<Simbolo> simbolos){
+        ArrayList<Simbolo> temp = (ArrayList<Simbolo>) simbolos.clone();
+        Collections.reverse(temp);
+        return temp;
     }
     
-    public String invertirCadena(String produccion){
-        String s = "";
-        boolean sw = false;
-        for (int i = produccion.length(); i > 0; i--) {
-            String l = produccion.substring(i-1, i);
-            if(sw){
-                s += l + "'";
-                sw = false;
-            }else{
-                if(l.compareTo("'")==0){
-                    sw = true;                
-                }else{
-                    s += l;
+    public String[][] probar(String s){        
+        ArrayList<ArrayList> pilaF = new ArrayList<>();
+        ArrayList<ArrayList> entradaF = new ArrayList<>();
+        ArrayList<Produccion> salidaF = new ArrayList<>();
+        
+        ArrayList<Simbolo> pila = new ArrayList<>();
+        pila.add(new Terminal("$"));
+        pila.add(gram.noTerminales.get(0));
+        pilaF.add(pila);        
+        
+        ArrayList<Simbolo> entrada = new ArrayList<>();
+        for (int i = 0; i < s.length(); i++) {
+            entrada.add(new Terminal(s.substring(i, i+1)));
+        }
+        entrada.add(new Terminal("$"));        
+        entradaF.add(entrada);        
+        
+        int i = 0;
+        while(true){
+            if(pilaF.get(i).size()==1 && pilaF.get(i).get(0).equals(new Terminal("$")) && entradaF.get(i).size()==1 && entradaF.get(i).get(0).equals(new Terminal("$"))){                
+                break;
+            }
+            Simbolo simboloPila = (Simbolo)pilaF.get(i).get(pilaF.get(i).size()-1);            
+            Simbolo simboloEntrada = (Simbolo)entradaF.get(i).get(0);
+            if(gram.isNonTerminal(simboloPila)){
+                Produccion produccion = getProduccion((NoTerminal)simboloPila, (Terminal)simboloEntrada);
+                if(produccion==null){
+                    JOptionPane.showMessageDialog(null, "La cadena " + s + " No es producida por la GIC");
+                    salidaF.add(produccion);
+                    return toMatrix(pilaF, entradaF, salidaF);
                 }
-            }  
+                salidaF.add(produccion);
+                i++;                
+                ArrayList<Simbolo> miProduccion = (ArrayList<Simbolo>) produccion.simbolos.clone();
+                miProduccion.remove(new Terminal("&"));
+                ArrayList<Simbolo> pilaT = (ArrayList<Simbolo>) pilaF.get(i-1).clone();                                
+                pilaT.remove(pilaT.size()-1);
+                pilaT.addAll(invertir(miProduccion));                
+                pilaF.add(pilaT);                
+                
+                ArrayList<Simbolo> entradaT = (ArrayList<Simbolo>) entradaF.get(i-1).clone();                
+                entradaF.add(entradaT);                
+            }else{
+                if(simboloEntrada.equals(simboloPila)){
+                    i++;
+                    ArrayList<Simbolo> pilaT = (ArrayList<Simbolo>) pilaF.get(i-1).clone();     
+                    ArrayList<Simbolo> entradaT = (ArrayList<Simbolo>) entradaF.get(i-1).clone();
+                    pilaT.remove(pilaT.size()-1);
+                    entradaT.remove(0);
+                    pilaF.add(pilaT);
+                    entradaF.add(entradaT);
+                    salidaF.add(null);                    
+                }else{
+                    JOptionPane.showMessageDialog(null, "La cadena " + s + " No es producida por la GIC");
+                    salidaF.add(null);
+                    return toMatrix(pilaF, entradaF, salidaF);
+                }
+            }
+        }
+        salidaF.add(null);
+        return toMatrix(pilaF, entradaF, salidaF);
+    }   
+      
+    public String arrayToString(ArrayList<Object> a){
+        String s = "";
+        for (Object a1 : a) {
+            s += a1.toString();
         }
         return s;
     }
     
-    public String[][] probarCadena(String cadena){
-        String[][] m = new String[20][3];
+    public String[][] toMatrix(ArrayList<ArrayList> pilaF, ArrayList<ArrayList> entradaF, ArrayList<Produccion> salidaF){
+        String[][] m = new String[pilaF.size()][3];
         for (int i = 0; i < m.length; i++) {
             m[i][0] = m[i][1] = m[i][2] = "";
         }
-        m[0][0] = "$" + gramatica.noTerminales.get(0);
-        m[0][1] = cadena + "$";
-        boolean sw = true;
-        int i = 0;
-        while(sw){
-            if(m[i][0].compareTo("$")==0 && m[i][0].compareTo(m[i][1])==0){
-                sw = false;
-                break;
-            }
-            String pila = m[i][0].substring(m[i][0].length()-1);
-            if(pila.compareTo("'")==0){
-                pila = m[i][0].substring(m[i][0].length()-2);
-            }
-            String entrada = m[i][1].substring(0,1);
-            if(Gramatica.isNonTerminal(pila)){
-                String produccion = getProduccion(pila, entrada);
-                if(produccion.compareTo("")==0){
-                    JOptionPane.showMessageDialog(null, "La cadena " + cadena + " No es producida por la GIC");
-                    String[][] analisis = new String[i+1][3];
-                    for (int j = 0; j < analisis.length; j++) {
-                        analisis[j][0] = m[j][0];
-                        analisis[j][1] = m[j][1];
-                        analisis[j][2] = m[j][2];
-                    }
-                    return analisis;
-                }
-                m[i][2] = produccion;
-                i++;
-                String produccionInversa = produccion.split("->")[1];
-                produccionInversa = invertirCadena(produccionInversa);
-                produccionInversa = produccionInversa.replaceAll("&", "");
-                m[i][0] = m[i-1][0].substring(0,m[i-1][0].length()-pila.length()) + produccionInversa;
-                m[i][1] = m[i-1][1] ;                
+        for (int i = 0; i < m.length; i++) {
+            m[i][0] = arrayToString(pilaF.get(i));
+            m[i][1] = arrayToString(entradaF.get(i));
+            if(salidaF.get(i)==null){
+                m[i][2] = "";
             }else{
-                if(pila.compareTo(entrada)==0){
-                    i++;
-                    m[i][0] = m[i-1][0].substring(0,m[i-1][0].length()-1);
-                    m[i][1] = m[i-1][1].substring(1);
-                }else{
-                    JOptionPane.showMessageDialog(null, "La cadena " + cadena + " No es producida por la GIC");
-                    String[][] analisis = new String[i+1][3];
-                    for (int j = 0; j < analisis.length; j++) {
-                        analisis[j][0] = m[j][0];
-                        analisis[j][1] = m[j][1];
-                        analisis[j][2] = m[j][2];
-                    }
-                    return analisis;
-                }                
+                m[i][2] = salidaF.get(i).toString();
             }
-            
         }
-        String[][] analisis = new String[i+1][3];
-        for (int j = 0; j < analisis.length; j++) {
-            analisis[j][0] = m[j][0];
-            analisis[j][1] = m[j][1];
-            analisis[j][2] = m[j][2];
-        }
-        return analisis;
-    }
-
-    public TablaM(Gramatica gramatica, Primeros primeros, Siguientes siguientes) {
-        this.gramatica = gramatica;
-        this.primeros = primeros;
-        this.siguientes = siguientes;
-        this.tablaM = new String[gramatica.noTerminales.size()][gramatica.terminales.size()+2];
-        for (int i = 0; i < this.tablaM.length; i++) {
-            for (int j = 0; j < this.tablaM[i].length; j++) {                    
-                this.tablaM[i][j]="";
+        return m;
+    }    
+    
+    public TablaM(Gram gram) {
+        this.gram = gram;   
+        this.gram.terminales.add(new Terminal("$"));
+        this.tM = new Produccion[gram.noTerminales.size()][gram.terminales.size()];
+        for (int i = 0; i < this.tM.length; i++) {
+            for (int j = 0; j < this.tM[i].length; j++) {                    
+                this.tM[i][j] = null;
             }                
         }
-        for (int i = 1; i < this.tablaM.length; i++) {
-            this.tablaM[i][0] = gramatica.noTerminales.get(i-1);                
-        }
         setTablaM();
-    }
-    
-    public void setTablaM(){
-        for (String produccion : gramatica.producciones) {
-            String noTerminal = produccion.split("->")[0];
-            String miProduccion = produccion.split("->")[1];
-            ArrayList<String> misPrimeros = primeros.miniPrimeros(miProduccion);
-            if(!misPrimeros.contains("&")){
-                for (String miPrimero : misPrimeros) {
-                    this.tablaM[getRowIndex(noTerminal)][getColumnIndex(miPrimero)] = produccion;
-                }
-            
-            }else{
-                ArrayList<String> misSiguientes = siguientes.getSiguientes(noTerminal);
-                for (String miSiguiente : misSiguientes) {
-                    this.tablaM[getRowIndex(noTerminal)][getColumnIndex(miSiguiente)] = produccion;
-                }
-            }
-        }
-    }
-    
-    public int getColumnIndex(String simbolo){
-        for (String  terminal: gramatica.terminales) {
-            if(simbolo.compareTo(terminal)==0){
-                return gramatica.terminales.indexOf(terminal);
-            }
-        }
-        return -1;
-    }
-    
-    public int getRowIndex(String simbolo){
-        for (String  terminal: gramatica.noTerminales) {
-            if(simbolo.compareTo(terminal)==0){
-                return gramatica.noTerminales.indexOf(terminal);
-            }
-        }
         
+    }       
+    
+     public void setTablaM(){
+         for(Produccion produccion : gram.producciones){             
+             NoTerminal noTerminal = gram.getNoTerminal(produccion.noTerminal);  
+             ArrayList<Simbolo> primeros = gram.primerosParciales(produccion.simbolos);
+             if(!primeros.contains(new Terminal("&"))){
+                 for(Simbolo simbolo : primeros){
+                     tM[getRowIndex(noTerminal)][getColumnIndex((Terminal)simbolo)] = produccion;
+                 }
+             }else{
+                 for(Simbolo simbolo : gram.getSiguientes(noTerminal)){
+                     tM[getRowIndex(noTerminal)][getColumnIndex((Terminal)simbolo)] = produccion;
+                 }
+             }
+         }        
+    }     
+     
+     public String[][] tablaMToString(){
+         String[][] m = new String[gram.noTerminales.size()][gram.terminales.size()];
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 0; j < m[i].length; j++) {                    
+                m[i][j]="";
+            }                
+        }
+        for (int i = 0; i < m.length; i++) {
+            m[i][0] = gram.noTerminales.get(i).toString();
+        }
+        for (int i = 0; i < m.length; i++) {
+            for (int j = 1; j < m[i].length; j++) {
+                if(tM[i][j-1]==null){
+                    m[i][j] = "";
+                }else{
+                    m[i][j]=tM[i][j-1].toString();
+                }
+            }                
+        }        
+         return m;
+     }       
+    
+    public int getColumnIndex(Terminal simbolo){
+        for(Terminal terminal : gram.terminales){
+            if(terminal.equals(simbolo)){
+                return gram.terminales.indexOf(terminal);
+            }
+        }
         return -1;
+    }   
+    
+    public int getRowIndex(NoTerminal simbolo){
+        for(NoTerminal noTerminal : gram.noTerminales){
+            if(noTerminal.equals(simbolo)){
+                return gram.noTerminales.indexOf(noTerminal);
+            }
+        }
+        return -1;
+    }
+    
+    public static void printMatrix(Object[][] m) {
+        try {
+            int rows = m.length;
+            int columns = m[0].length;
+            String str = "|\t";
+
+            for (int i = 0; i < rows; i++) {
+                
+                for (int j = 0; j < columns; j++) {
+                    if(m[i][j]==null){
+                        str += " " + "\t";
+                    }else{
+                        str += m[i][j].toString() + "\t";
+                    }
+                }
+                System.out.println(str + "|");
+                str = "|\t";
+            }
+
+        } catch (Exception e) {
+            System.out.println("Matrix is empty!!");
+        }
     }
     
     public static void main(String[] args) {
-        //View vista = new View();
-        //vista.show();   
-        File gramatica = new File(System.getProperty("user.dir") + "//" + "ejemplo2.txt");
-        Gram g = new Gram(gramatica);
-        System.out.println("Producciones: ");
-        System.out.println(g.producciones.toString());
-        System.out.println("No terminales: ");
-        System.out.println(g.noTerminales.toString());
-        System.out.println("Terminales: ");
-        System.out.println(g.terminales.toString());
-        for(NoTerminal nt : g.noTerminales){
-            System.out.println(nt.produceEpsilon);
-        }
-        System.out.println("Primeros: ");        
-        for(Prim primero : g.primeros){
-            System.out.println(primero.toString());
-        }
+        View vista = new View();
+        vista.show();   
     }
     
 }

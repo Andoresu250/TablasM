@@ -35,7 +35,6 @@ public class View extends javax.swing.JFrame {
         jScrollPane7 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -139,9 +138,6 @@ public class View extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setText("Tabla M:");
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel1.setText("Nota: el caracter ' es un caracter reservado por favor no utilizarlo.");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -152,8 +148,6 @@ public class View extends javax.swing.JFrame {
                     .addComponent(jScrollPane7)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -174,9 +168,7 @@ public class View extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jLabel1))
+                .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -204,8 +196,8 @@ public class View extends javax.swing.JFrame {
             String[] header = {"Pila", "Entrada", "Salida"};
             DefaultTableModel dtm2 = new DefaultTableModel(null, header);
             jTable2.setModel(dtm2);
-            Gramatica miGramatica = new Gramatica(archivoGramatica);
-            int n = miGramatica.original.size();
+            Gram miGramatica = new Gram(archivoGramatica);
+            int n = miGramatica.originalProducciones.size();
             int m = miGramatica.producciones.size();
             String[][] matrizGramatica;
             if(n >= m){matrizGramatica = new String[n][4];}
@@ -217,35 +209,29 @@ public class View extends javax.swing.JFrame {
                 }                
             }
             
-            for (int i = 0; i < miGramatica.original.size(); i++) {
-                matrizGramatica[i][0] = miGramatica.original.get(i);
+            for (int i = 0; i < miGramatica.originalProducciones.size(); i++) {
+                matrizGramatica[i][0] = miGramatica.originalProducciones.get(i).toString();
             }
             
             for (int i = 0; i < miGramatica.producciones.size(); i++) {
-                matrizGramatica[i][1] = miGramatica.producciones.get(i);
-            }
+                matrizGramatica[i][1] = miGramatica.producciones.get(i).toString();
+            }            
             
-            Primeros primeros = new Primeros(miGramatica);
-            primeros.setPrimeros();            
-            for (int i = 0; i < primeros.getPrimeros().size(); i++) {
-                matrizGramatica[i][2] = primeros.getPrimeros().get(i).toString();
-            }
-            Siguientes siguientes = new Siguientes(miGramatica, primeros);
-            siguientes.setSiguientes();
-            for (int i = 0; i < siguientes.getSiguientes().size(); i++) {
-                matrizGramatica[i][3] = siguientes.getSiguientes().get(i).toString();
+            for (int i = 0; i < miGramatica.primeros.size(); i++) {
+                matrizGramatica[i][2] = miGramatica.primeros.get(i).toString();
+            }            
+            for (int i = 0; i < miGramatica.siguientes.size(); i++) {
+                matrizGramatica[i][3] = miGramatica.siguientes.get(i).toString();
             }           
             String[] asd = {"Gramatica Original", "Nueva Gramatica", "Primeros", "Siguientes"};
             DefaultTableModel tmg = new DefaultTableModel(matrizGramatica,asd);
-            jTable4.setModel(tmg);
-            miGramatica.terminales.add(0, " ");
-            miGramatica.terminales.add("$");
+            jTable4.setModel(tmg);                        
             
-            tablaM = new TablaM(miGramatica, primeros, siguientes);
-            
-            DefaultTableModel tm = new DefaultTableModel(tablaM.tablaM, tablaM.gramatica.terminales.toArray());
+            tablaM = new TablaM(miGramatica);
+            tablaM.gram.terminales.add(0, new Terminal(" "));            
+            DefaultTableModel tm = new DefaultTableModel(tablaM.tablaMToString(), tablaM.gram.terminales.toArray());
             for (int i = 0; i < miGramatica.noTerminales.size(); i++) {
-                tm.setValueAt(miGramatica.noTerminales.get(i), i, 0);
+                tm.setValueAt(miGramatica.noTerminales.get(i).toString(), i, 0);
             }                        
             jTable3.setModel(tm);
             
@@ -256,7 +242,7 @@ public class View extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         String[] header = {"Pila", "Entrada", "Salida"};
-        DefaultTableModel tm = new DefaultTableModel(tablaM.probarCadena(jTextField1.getText()), header);      
+        DefaultTableModel tm = new DefaultTableModel(tablaM.probar(jTextField1.getText()), header);      
         jTable2.setModel(tm);
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -303,7 +289,6 @@ public class View extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;

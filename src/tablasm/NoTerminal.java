@@ -32,7 +32,9 @@ public class NoTerminal extends Simbolo{
     public boolean equals(Object object) {
         boolean sameSame = false;
         if(object != null && object instanceof NoTerminal){
-            sameSame = this.simbolo.toString().compareTo(((NoTerminal) object).simbolo.toString())==0;
+            String s1 = this.toString();
+            String s2 = ((NoTerminal)object).toString();
+            sameSame = s1.compareTo(s2)==0;
         }
         return sameSame;
     }
