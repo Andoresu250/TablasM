@@ -1,9 +1,0 @@
-D->A
-A->AB
-A->ApC
-A->ApD
-A->a
-A->b
-B->c
-C->d
-D->e

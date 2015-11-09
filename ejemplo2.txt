@@ -1,7 +1,0 @@
-A->BCDf
-A->adfgdfg
-B->b
-B->&
-C->c
-C->&
-D->d
